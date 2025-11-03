@@ -3,82 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pre and Post Maintenance Tools and Area Checklist</title>
+    <title>Maintenance Checklist</title>
     <!-- Include html2pdf library -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <style>
         /* CSS Styling */
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+            --accent-color: #e74c3c;
+            --success-color: #2ecc71;
+            --light-color: #ecf0f1;
+            --dark-color: #34495e;
+        }
+        
         * {
             box-sizing: border-box;
-            font-family: Arial, sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
         
         body {
             margin: 0;
-            padding: 20px;
-            background-color: #f5f5f5;
+            padding: 15px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
             display: flex;
             justify-content: center;
+            min-height: 100vh;
         }
         
         .container {
-            width: 210mm; /* A4 width */
+            width: 100%;
+            max-width: 210mm; /* A4 width */
             min-height: 297mm; /* A4 height */
             background-color: white;
             padding: 15mm;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             margin-bottom: 20px;
+            border-radius: 8px;
         }
         
         .header {
             text-align: center;
             margin-bottom: 20px;
-            border-bottom: 2px solid #333;
+            border-bottom: 2px solid var(--primary-color);
             padding-bottom: 10px;
         }
         
         .header h1 {
             margin: 0;
             font-size: 24px;
+            color: var(--primary-color);
         }
         
         .form-section {
             margin-bottom: 20px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow: hidden;
         }
         
         .form-section h2 {
-            background-color: #e0e0e0;
-            padding: 8px;
-            margin: 0 0 10px 0;
+            background: linear-gradient(to right, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 10px;
+            margin: 0;
             font-size: 18px;
-            border: 1px solid #ccc;
         }
         
         .form-row {
             display: flex;
+            flex-wrap: wrap;
             margin-bottom: 10px;
             align-items: center;
+            padding: 0 10px;
         }
         
         .form-row label {
-            width: 200px;
+            width: 150px;
             font-weight: bold;
+            color: var(--dark-color);
         }
         
         input[type="text"], input[type="date"], input[type="time"] {
-            padding: 5px;
+            padding: 8px;
             border: 1px solid #ccc;
-            border-radius: 3px;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 200px;
         }
         
         .maintenance-type {
             display: flex;
             gap: 20px;
+            flex-wrap: wrap;
         }
         
         .maintenance-type label {
             width: auto;
             font-weight: normal;
+            display: flex;
+            align-items: center;
+            gap: 5px;
         }
         
         .checklist {
@@ -94,23 +119,18 @@
         }
         
         .checklist th {
-            background-color: #f0f0f0;
+            background-color: var(--light-color);
             font-weight: bold;
         }
         
-        .checklist-item {
-            display: flex;
-            align-items: center;
-            margin-bottom: 5px;
-        }
-        
-        .checklist-item-text {
-            flex: 1;
+        .checklist tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
         
         .check-options {
             display: flex;
-            gap: 20px;
+            gap: 10px;
+            justify-content: center;
         }
         
         .check-option {
@@ -132,7 +152,7 @@
         }
         
         .tool-log th {
-            background-color: #f0f0f0;
+            background-color: var(--light-color);
             font-weight: bold;
         }
         
@@ -141,25 +161,113 @@
             border: none;
             text-align: center;
             padding: 5px;
+            background: transparent;
+        }
+        
+        .tool-log tr:nth-child(even) {
+            background-color: #f9f9f9;
         }
         
         .button-container {
-            text-align: center;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
             margin-top: 30px;
         }
         
         button {
             padding: 10px 20px;
-            background-color: #4CAF50;
-            color: white;
             border: none;
             border-radius: 4px;
             cursor: pointer;
             font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .save-btn {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .pdf-btn {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .email-btn {
+            background-color: var(--secondary-color);
+            color: white;
         }
         
         button:hover {
-            background-color: #45a049;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .status-indicator {
+            text-align: center;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        
+        .status-saved {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        
+        .status-unsaved {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            .form-row {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .form-row label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            input[type="text"], input[type="date"], input[type="time"] {
+                width: 100%;
+                min-width: auto;
+            }
+            
+            .checklist, .tool-log {
+                font-size: 14px;
+            }
+            
+            .checklist th, .checklist td, 
+            .tool-log th, .tool-log td {
+                padding: 5px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+            }
+            
+            button {
+                width: 100%;
+                justify-content: center;
+            }
         }
         
         @media print {
@@ -176,6 +284,10 @@
             button {
                 display: none;
             }
+            
+            .status-indicator {
+                display: none;
+            }
         }
     </style>
 </head>
@@ -186,8 +298,14 @@
             <h1>Pre and Post Maintenance Tools and Area Checklist</h1>
         </div>
         
+        <!-- Status Indicator -->
+        <div id="status-indicator" class="status-indicator status-unsaved">
+            Unsaved Changes - Please save your progress
+        </div>
+        
         <!-- Date and Maintenance Type Section -->
         <div class="form-section">
+            <h2>Maintenance Information</h2>
             <div class="form-row">
                 <label for="date">Date:</label>
                 <input type="date" id="date">
@@ -202,6 +320,10 @@
                     <label><input type="checkbox" id="general"> General</label>
                     <label><input type="checkbox" id="breakdown"> Breakdown</label>
                 </div>
+            </div>
+            <div class="form-row">
+                <label for="machine">Machine/Equipment:</label>
+                <input type="text" id="machine" placeholder="Enter machine name">
             </div>
         </div>
         
@@ -265,11 +387,11 @@
             
             <div class="form-row">
                 <label for="technician-pre">Technician Name:</label>
-                <input type="text" id="technician-pre">
+                <input type="text" id="technician-pre" placeholder="Enter technician name">
             </div>
             <div class="form-row">
                 <label for="supervisor-pre">Supervisor Name:</label>
-                <input type="text" id="supervisor-pre">
+                <input type="text" id="supervisor-pre" placeholder="Enter supervisor name">
             </div>
         </div>
         
@@ -287,68 +409,68 @@
                 <tbody>
                     <tr>
                         <td>Spanners</td>
-                        <td><input type="text" id="spanners-before"></td>
-                        <td><input type="text" id="spanners-after"></td>
+                        <td><input type="text" id="spanners-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="spanners-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Torque Gauges</td>
-                        <td><input type="text" id="torque-gauges-before"></td>
-                        <td><input type="text" id="torque-gauges-after"></td>
+                        <td><input type="text" id="torque-gauges-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="torque-gauges-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Files</td>
-                        <td><input type="text" id="files-before"></td>
-                        <td><input type="text" id="files-after"></td>
+                        <td><input type="text" id="files-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="files-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Pliers</td>
-                        <td><input type="text" id="pliers-before"></td>
-                        <td><input type="text" id="pliers-after"></td>
+                        <td><input type="text" id="pliers-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="pliers-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Hex Key Sets</td>
-                        <td><input type="text" id="hex-keys-before"></td>
-                        <td><input type="text" id="hex-keys-after"></td>
+                        <td><input type="text" id="hex-keys-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="hex-keys-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Scrapers</td>
-                        <td><input type="text" id="scrapers-before"></td>
-                        <td><input type="text" id="scrapers-after"></td>
+                        <td><input type="text" id="scrapers-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="scrapers-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Chisels</td>
-                        <td><input type="text" id="chisels-before"></td>
-                        <td><input type="text" id="chisels-after"></td>
+                        <td><input type="text" id="chisels-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="chisels-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Adjustable Wrenches</td>
-                        <td><input type="text" id="wrenches-before"></td>
-                        <td><input type="text" id="wrenches-after"></td>
+                        <td><input type="text" id="wrenches-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="wrenches-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Punches</td>
-                        <td><input type="text" id="punches-before"></td>
-                        <td><input type="text" id="punches-after"></td>
+                        <td><input type="text" id="punches-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="punches-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Hammers</td>
-                        <td><input type="text" id="hammers-before"></td>
-                        <td><input type="text" id="hammers-after"></td>
+                        <td><input type="text" id="hammers-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="hammers-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Ratchet Wrenches</td>
-                        <td><input type="text" id="ratchet-before"></td>
-                        <td><input type="text" id="ratchet-after"></td>
+                        <td><input type="text" id="ratchet-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="ratchet-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Screwdrivers</td>
-                        <td><input type="text" id="screwdrivers-before"></td>
-                        <td><input type="text" id="screwdrivers-after"></td>
+                        <td><input type="text" id="screwdrivers-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="screwdrivers-after" placeholder="Condition after"></td>
                     </tr>
                     <tr>
                         <td>Special/Other Tools (if any)</td>
-                        <td><input type="text" id="special-before"></td>
-                        <td><input type="text" id="special-after"></td>
+                        <td><input type="text" id="special-before" placeholder="Condition before"></td>
+                        <td><input type="text" id="special-after" placeholder="Condition after"></td>
                     </tr>
                 </tbody>
             </table>
@@ -408,22 +530,46 @@
             
             <div class="form-row">
                 <label for="technician-post">Technician Name:</label>
-                <input type="text" id="technician-post">
+                <input type="text" id="technician-post" placeholder="Enter technician name">
             </div>
             <div class="form-row">
                 <label for="supervisor-post">Supervisor Name:</label>
-                <input type="text" id="supervisor-post">
+                <input type="text" id="supervisor-post" placeholder="Enter supervisor name">
             </div>
         </div>
         
-        <!-- Generate PDF Button -->
+        <!-- Action Buttons -->
         <div class="button-container">
-            <button id="generate-pdf">Generate PDF Report</button>
+            <button id="save-data" class="save-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 0 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1H2z"/>
+                </svg>
+                Save Progress
+            </button>
+            <button id="generate-pdf" class="pdf-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                </svg>
+                Generate PDF Report
+            </button>
+            <button id="email-mutinda" class="email-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
+                </svg>
+                Email Mutinda
+            </button>
+            <button id="email-muinde" class="email-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.05 3.555A2 2 0 0 1 2 2h12a2 2 0 0 1 1.95 1.555L8 8.414.05 3.555ZM0 4.697v7.104l5.803-3.558L0 4.697ZM6.761 8.83l-6.57 4.027A2 2 0 0 0 2 14h12a2 2 0 0 0 1.808-1.144l-6.57-4.027L8 9.586l-1.239-.757Zm3.436-.586L16 11.801V4.697l-5.803 3.546Z"/>
+                </svg>
+                Email Muinde
+            </button>
         </div>
     </div>
 
     <script>
-        // JavaScript for interactivity and PDF generation
+        // JavaScript for interactivity, local storage, and email functionality
         document.addEventListener('DOMContentLoaded', function() {
             // Set current date and time
             const now = new Date();
@@ -432,6 +578,9 @@
             // Format time to HH:MM
             const timeString = now.toTimeString().substring(0, 5);
             document.getElementById('time').value = timeString;
+            
+            // Load saved data if available
+            loadSavedData();
             
             // Ensure only one checkbox is selected per row in checklists
             const preCheckboxes = document.querySelectorAll('.pre-check');
@@ -447,6 +596,9 @@
                         cb.checked = false;
                     }
                 });
+                
+                // Update status indicator when form changes
+                updateStatusIndicator(false);
             }
             
             preCheckboxes.forEach(checkbox => {
@@ -477,7 +629,23 @@
                             }
                         });
                     }
+                    updateStatusIndicator(false);
                 });
+            });
+            
+            // Add change listeners to all inputs to track unsaved changes
+            const allInputs = document.querySelectorAll('input[type="text"], input[type="date"], input[type="time"]');
+            allInputs.forEach(input => {
+                input.addEventListener('input', function() {
+                    updateStatusIndicator(false);
+                });
+            });
+            
+            // Save data to local storage
+            document.getElementById('save-data').addEventListener('click', function() {
+                saveData();
+                updateStatusIndicator(true);
+                showNotification('Data saved successfully!');
             });
             
             // PDF Generation
@@ -493,6 +661,196 @@
                 
                 html2pdf().set(opt).from(element).save();
             });
+            
+            // Email functionality
+            document.getElementById('email-mutinda').addEventListener('click', function() {
+                sendEmail('mutinda@allpack.co.ke');
+            });
+            
+            document.getElementById('email-muinde').addEventListener('click', function() {
+                sendEmail('muinde@allpack.co.ke');
+            });
+            
+            // Function to save data to localStorage
+            function saveData() {
+                const formData = {
+                    date: document.getElementById('date').value,
+                    time: document.getElementById('time').value,
+                    machine: document.getElementById('machine').value,
+                    general: document.getElementById('general').checked,
+                    breakdown: document.getElementById('breakdown').checked,
+                    technicianPre: document.getElementById('technician-pre').value,
+                    supervisorPre: document.getElementById('supervisor-pre').value,
+                    technicianPost: document.getElementById('technician-post').value,
+                    supervisorPost: document.getElementById('supervisor-post').value
+                };
+                
+                // Save pre-maintenance checkboxes
+                const preChecks = {};
+                preCheckboxes.forEach(checkbox => {
+                    const item = checkbox.getAttribute('data-item');
+                    const value = checkbox.getAttribute('value');
+                    if (!preChecks[item]) preChecks[item] = {};
+                    preChecks[item][value] = checkbox.checked;
+                });
+                formData.preChecks = preChecks;
+                
+                // Save post-maintenance checkboxes
+                const postChecks = {};
+                postCheckboxes.forEach(checkbox => {
+                    const item = checkbox.getAttribute('data-item');
+                    const value = checkbox.getAttribute('value');
+                    if (!postChecks[item]) postChecks[item] = {};
+                    postChecks[item][value] = checkbox.checked;
+                });
+                formData.postChecks = postChecks;
+                
+                // Save tool log data
+                const toolLog = {};
+                const toolInputs = document.querySelectorAll('.tool-log input');
+                toolInputs.forEach(input => {
+                    toolLog[input.id] = input.value;
+                });
+                formData.toolLog = toolLog;
+                
+                localStorage.setItem('maintenanceChecklist', JSON.stringify(formData));
+            }
+            
+            // Function to load data from localStorage
+            function loadSavedData() {
+                const savedData = localStorage.getItem('maintenanceChecklist');
+                if (savedData) {
+                    const formData = JSON.parse(savedData);
+                    
+                    document.getElementById('date').value = formData.date || '';
+                    document.getElementById('time').value = formData.time || '';
+                    document.getElementById('machine').value = formData.machine || '';
+                    document.getElementById('general').checked = formData.general || false;
+                    document.getElementById('breakdown').checked = formData.breakdown || false;
+                    document.getElementById('technician-pre').value = formData.technicianPre || '';
+                    document.getElementById('supervisor-pre').value = formData.supervisorPre || '';
+                    document.getElementById('technician-post').value = formData.technicianPost || '';
+                    document.getElementById('supervisor-post').value = formData.supervisorPost || '';
+                    
+                    // Load pre-maintenance checkboxes
+                    if (formData.preChecks) {
+                        for (const item in formData.preChecks) {
+                            for (const value in formData.preChecks[item]) {
+                                const checkbox = document.querySelector(`.pre-check[data-item="${item}"][value="${value}"]`);
+                                if (checkbox) {
+                                    checkbox.checked = formData.preChecks[item][value];
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Load post-maintenance checkboxes
+                    if (formData.postChecks) {
+                        for (const item in formData.postChecks) {
+                            for (const value in formData.postChecks[item]) {
+                                const checkbox = document.querySelector(`.post-check[data-item="${item}"][value="${value}"]`);
+                                if (checkbox) {
+                                    checkbox.checked = formData.postChecks[item][value];
+                                }
+                            }
+                        }
+                    }
+                    
+                    // Load tool log data
+                    if (formData.toolLog) {
+                        for (const id in formData.toolLog) {
+                            const input = document.getElementById(id);
+                            if (input) {
+                                input.value = formData.toolLog[id];
+                            }
+                        }
+                    }
+                    
+                    updateStatusIndicator(true);
+                }
+            }
+            
+            // Function to update status indicator
+            function updateStatusIndicator(isSaved) {
+                const statusIndicator = document.getElementById('status-indicator');
+                if (isSaved) {
+                    statusIndicator.textContent = 'All changes saved';
+                    statusIndicator.className = 'status-indicator status-saved';
+                } else {
+                    statusIndicator.textContent = 'Unsaved Changes - Please save your progress';
+                    statusIndicator.className = 'status-indicator status-unsaved';
+                }
+            }
+            
+            // Function to send email
+            function sendEmail(email) {
+                const subject = 'Maintenance Checklist Report';
+                const machine = document.getElementById('machine').value || 'Unknown Machine';
+                const date = document.getElementById('date').value || 'Unknown Date';
+                
+                let body = `Maintenance Checklist Report\n`;
+                body += `Machine: ${machine}\n`;
+                body += `Date: ${date}\n\n`;
+                
+                // Add pre-maintenance summary
+                body += `PRE-MAINTENANCE CHECKS:\n`;
+                for (let i = 1; i <= 7; i++) {
+                    const checkRow = document.querySelectorAll(`.pre-check[data-item="${i}"]`);
+                    let status = 'Not checked';
+                    checkRow.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            status = checkbox.value.toUpperCase();
+                        }
+                    });
+                    
+                    const itemText = document.querySelector(`.pre-check[data-item="${i}"]`).closest('tr').cells[0].textContent;
+                    body += `${itemText}: ${status}\n`;
+                }
+                
+                body += `\nPOST-MAINTENANCE CHECKS:\n`;
+                for (let i = 1; i <= 6; i++) {
+                    const checkRow = document.querySelectorAll(`.post-check[data-item="${i}"]`);
+                    let status = 'Not checked';
+                    checkRow.forEach(checkbox => {
+                        if (checkbox.checked) {
+                            status = checkbox.value.toUpperCase();
+                        }
+                    });
+                    
+                    const itemText = document.querySelector(`.post-check[data-item="${i}"]`).closest('tr').cells[0].textContent;
+                    body += `${itemText}: ${status}\n`;
+                }
+                
+                const mailtoLink = `mailto:${email}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+                window.location.href = mailtoLink;
+            }
+            
+            // Function to show notification
+            function showNotification(message) {
+                // Create notification element
+                const notification = document.createElement('div');
+                notification.textContent = message;
+                notification.style.position = 'fixed';
+                notification.style.bottom = '20px';
+                notification.style.right = '20px';
+                notification.style.backgroundColor = '#2ecc71';
+                notification.style.color = 'white';
+                notification.style.padding = '10px 20px';
+                notification.style.borderRadius = '4px';
+                notification.style.boxShadow = '0 2px 10px rgba(0,0,0,0.2)';
+                notification.style.zIndex = '1000';
+                notification.style.transition = 'opacity 0.3s';
+                
+                document.body.appendChild(notification);
+                
+                // Remove notification after 3 seconds
+                setTimeout(() => {
+                    notification.style.opacity = '0';
+                    setTimeout(() => {
+                        document.body.removeChild(notification);
+                    }, 300);
+                }, 3000);
+            }
         });
     </script>
 </body>
